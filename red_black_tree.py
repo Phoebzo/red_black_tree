@@ -38,13 +38,135 @@ class RedBlackTree:
         
 
     def remove(self,value):
-        return
+        if self.search(value) == True:
+            node = self.__searching(value, self.head)
+        #If node to delete is red
+
+            if node.get_color() == "RED":
+                #if node is end node
+                if node.get_left_child() == None and node.get_right_child() == None:
+                    if node.is_right_child() == True:
+                        node.get_parent().set_right_child(None)
+                    else:
+                        node.get_parent().set_left_child(None)
+
+                #if node has children
+                elif node.is_right_child() == True:
+                    node.get_parent().set_right_child(node.get_right_child())
+                    right_child = node.get_right_child()
+                    right_child.set_parent(node.get_parent())
+                    while right_child.get_left_child() != None:
+                        right_child = right_child.get_left_child()
+                    right_child.set_left_child(node.get_left_child())
+                    node.get_left_child().set_parent(right_child)
+                else:
+                    node.get_parent().set_left_child(node.get_left_child())
+                    left_child = node.get_left_child()
+                    left_child.set_parent(node.get_parent())
+                    while left_child.get_right_child() != None:
+                        left_child = left_child.get_right_child()
+                    left_child.set_right_child(node.get_right_child())
+                    node.get_right_child().set_parent(left_child)
+
+
+            else:
+                """
+                node_color_first = node.get_color()
+                if z.left == self.TNULL:
+                    x = z.right
+                    self.__rb_transplant(z, z.right)
+                elif (z.right == self.TNULL):
+                    x = z.left
+                    self.__rb_transplant(z, z.left)
+                else:
+                    y = self.minimum(z.right)
+                    y_original_color = y.color
+                    x = y.right
+                    if y.parent == z:
+                        x.parent = y
+                    else:
+                        self.__rb_transplant(y, y.right)
+                        y.right = z.right
+                        y.right.parent = y
+
+                    self.__rb_transplant(z, y)
+                    y.left = z.left
+                    y.left.parent = y
+                    y.color = z.color
+                if y_original_color == 0:
+                    self.__remove(x)
+                """
+
+    def __remove(self, node):
+        while node != self.head and node.color == "RED":
+            if node.is_right_child != True:
+                sibling = node.get_sibling()
+                if sibling.get_color() == "RED":
+                    sibling.set_color("BLACK")
+                    node.get_parent().set_color("RED")
+                    self.__rotate(node.get_parent(), "LEFT")
+                    sibling = node.get_sibling()
+
+                if sibling.get_left_child().get_color() == "BLACK" and sibling.get_right_child().get_color() == "BLACK":
+                    sibling.set_color("RED")
+                    node = node.get_parent()
+                else:
+                    if sibling.get_right_child().get_color()=="BLACK":
+                        sibling.get_left_child().set_color("BLACK")
+                        sibling.set_color("RED")
+                        self.__rotate(sibling, "RIGHT")
+                        sibling = node.get_sibling()
+
+                    sibling.set_color(node.get_parent().get_color())
+                    node.get_parent().set_color("BLACK")
+                    sibling.get_right_child().set_color("BLACK")
+                    self.__rotate(node.get_parent(), "RIGHT")
+                    node = self.head
+            else:
+                sibling = node.get_sibling()
+                if sibling.get_color() == "RED":
+                    sibling.set_color("BLACK")
+                    node.get_parent().set_color("RED")
+                    self.__rotate(node.get_parent(),"RIGHT")
+                    sibling = node.get_sibling()
+
+                if sibling.get_right_child().get_color() == "BLACK":
+                    sibling.set_color("RED")
+                    node = node.get_parent()
+                else:
+                    if sibling.get_left_child().get_color() == "BLACK":
+                        sibling.get_right_child().set_color("BLACK")
+                        sibling.set_color("RED")
+                        self.__rotate(sibling, "LEFT")
+                        sibling = node.get_sibling()
+
+                    sibling.set_color(node.get_parent().get_color())
+                    node.get_parent().set_color("BLACK")
+                    sibling.get_left_child().set_color("BLACK")
+                    self.__rotate(node.get_parent(), "RIGHT")
+                    node = self.head
+        node.set_color("BLACK")
+
+    def __rb_transplant(self, u, v):
+        if u.get_parent() == None:
+            self.head = v
+        elif u.is_right_child() == False:
+            u.get_parent().set_left_child(v) 
+        else:
+            u.get_parent().set_right_child(v)
+        v.set_parent(u.get_parent)
+
+
+
 
 
     def search(self,value):
         if self.head == None:
             return False
-        return self.__searching(value, self.head)
+        elif self.__searching(value, self.head) != False:
+            return True
+        else:
+            return False
 
 
     def path(self,value):
@@ -242,7 +364,7 @@ class RedBlackTree:
 
 
         elif value == head.get_value():
-            return True
+            return head
             
 
 
@@ -251,30 +373,14 @@ class RedBlackTree:
 if __name__ == "__main__":
     tree = RedBlackTree()
     tree.insert(10)
-    print(tree.bfs())
-    tree.insert(18)
-    print(tree.bfs())
     tree.insert(7)
-    print(tree.bfs())
-    tree.insert(15)
-    print(tree.bfs())
-    tree.insert(16)
-    print(tree.bfs())
+    tree.insert(20)
     tree.insert(30)
     print(tree.bfs())
-    tree.insert(25)
-    print(tree.bfs())
-    tree.insert(40)
-    print(tree.bfs())
-    tree.insert(60)
-    print(tree.bfs())
-    tree.insert(2)
-    print(tree.bfs())
-    tree.insert(1)
-    print(tree.bfs())
-    tree.insert(70)
-    print(tree.bfs())
     
+    tree.remove(30)
+    print(tree.bfs())
+
     """
     print(tree.search(45))
     print(tree.search(27))
