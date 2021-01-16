@@ -23,7 +23,9 @@ class Node:
         return self.parent
 
     def get_sibling(self):
-        if self == self.get_parent().get_left_child():
+        if self.get_parent() == None:
+            return None
+        elif self == self.get_parent().get_left_child():
             return self.get_parent().get_right_child()
         else:
             return self.get_parent().get_left_child()

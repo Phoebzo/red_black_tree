@@ -1,5 +1,7 @@
 from node import Node
 
+import sys
+
 class RedBlackTree:
     def __init__(self):
         self.head = None
@@ -12,13 +14,15 @@ class RedBlackTree:
 
         else:
             inserted_node = self.__insert(value, self.head)
-            if inserted_node == None:
+            if inserted_node == None or inserted_node.get_parent() == None or inserted_node.get_parent().get_parent() == None:
                 return
-            #if inserted_node.get_parent().get_color() != "BLACK":
-            node = self.__recolor_check(inserted_node)
+            
+            self.__recolor_rotate(inserted_node)
+
+
+            """
             print(tree.bfs())
             if node != None:
-            #else:
                 if node.is_right_child() == True and node.get_parent().is_right_child() == False:
                     self.__rotate(node, "LEFT")
                     self.__rotate(node, "LEFTLEFT")
@@ -28,12 +32,10 @@ class RedBlackTree:
                 elif node.is_right_child() == True and node.get_parent().is_right_child() == True:
                     self.__rotate(node, "RIGHTRIGHT")
 
-                """
-
                 
                 elif inserted_node.is_right_child() == False and inserted_node.get_parent().is_right_child() == False:
                     self.__rotate(inserted_node, "LEFTLEFT")
-                """
+            """
             return
         
 
@@ -213,48 +215,100 @@ class RedBlackTree:
 
         return closed_list
         
-    def __recolor_check(self, node):
-        if node.get_parent() != None and node.get_parent().get_color() == "RED":
+    def __recolor_rotate(self, node):
+        while node != self.head and node.get_parent().get_color() == "RED":
             parent = node.get_parent()
-            if parent.get_sibling() != None and parent.get_sibling().get_color() == "RED":
-                # Recolor
-                parent.set_color("BLACK")
-                parent.get_sibling().set_color("BLACK")
-                
-                # Check if parent's parent is not root
-                grandparent = parent.get_parent()
-                if grandparent != self.head:
-                    if grandparent.get_color() == "RED":
-                        grandparent.set_color("BLACK")
+            uncle = parent.get_sibling()
+            if uncle != None:
+                if uncle.is_right_child() == False: 
+                    if uncle.get_color() == "RED":
+                        uncle.set_color("BLACK")
+                        parent.set_color("BLACK")
+                        parent.get_parent().set_color("RED")
+                        node = parent.get_parent()
                     else:
-                        grandparent.set_color("RED")
+                        if node.is_right_child() == False:
+                            node = parent
+                            self.__rotate(node, "RIGHT")
+                        
+                        node.get_parent().set_color("BLACK")
+                        node.get_parent().get_parent().set_color("RED")
+                        self.__rotate(node.get_parent().get_parent(), "LEFT")
 
-                    if grandparent.get_parent() != self.head:
-                        return self.__recolor_check(parent)
+                else:
+                    if uncle.get_color() == "RED":
+                        uncle.set_color("BLACK")
+                        parent.set_color("BLACK")
+                        parent.get_parent().set_color("RED")
+                        node = parent.get_parent()
                     else:
-                        return None
+                        if node.is_right_child() == True:
+                            node = parent
+                            self.__rotate(node, "LEFT")
+                        
+                        node.get_parent().set_color("BLACK")
+                        node.get_parent().get_parent().set_color("RED")
+                        self.__rotate(node.get_parent().get_parent(), "RIGHT")
             else:
-                return node
-        return None
+                if parent.is_right_child() == True:
+                    if node.is_right_child() == False:
+                        node = parent
+                        self.__rotate(node, "RIGHT")
+                    
+                    node.get_parent().set_color("BLACK")
+                    node.get_parent().get_parent().set_color("RED")
+                    self.__rotate(node.get_parent().get_parent(), "LEFT")
+                else:
+                    print(self.bfs())
+
+                    if node.is_right_child() == True:
+                        node = parent
+                        self.__rotate(node, "LEFT")
+                        
+                    print(self.bfs())
+                    
+                    node.get_parent().set_color("BLACK")
+                    node.get_parent().get_parent().set_color("RED")
+                    self.__rotate(node.get_parent().get_parent(), "RIGHT")
+            
+        self.head.set_color("BLACK")
 
     def __rotate(self, child,  left_or_right):
         if left_or_right == "LEFT":
-            parent = child.get_parent()
-            parentparent = child.get_parent().get_parent()
-            parent.set_right_child(None)
-            child.set_left_child(parent)
-            parentparent.set_left_child(child)
-            child.set_parent(parentparent)
-            parent.set_parent(child)
+            right_child = child.get_right_child()
+            child.set_right_child(right_child.get_left_child())
+            if right_child.get_left_child() != None:
+                right_child.get_left_child().set_parent(child)
+            
+            right_child.set_parent(child.get_parent())
+
+            if child.get_parent() == None:
+                self.head = right_child
+            elif child.is_right_child() == False:
+                child.get_parent().set_left_child(right_child)
+            else:
+                child.get_parent().set_right_child(right_child)
+
+            right_child.set_left_child(child)
+            child.set_parent(right_child)
 
         elif left_or_right == "RIGHT":
-            parent = child.get_parent()
-            parentparent = child.get_parent().get_parent()
-            parent.set_left_child(None)
-            child.set_right_child(parent)
-            parentparent.set_right_child(child)
-            child.set_parent(parentparent)
-            parent.set_parent(child)
+            left_child = child.get_left_child()
+            child.set_left_child(left_child.get_right_child())
+            if left_child.get_right_child() != None:
+                left_child.get_right_child().set_parent(child)
+            
+            left_child.set_parent(child.get_parent())
+            if child.get_parent() == None:
+                self.head = left_child
+            elif child.is_right_child() == True:
+                child.get_parent().set_right_child(left_child)
+            else:
+                child.get_parent().set_left_child(left_child)
+
+            left_child.set_right_child(child)
+            child.set_parent(left_child)
+
 
         elif left_or_right == "RIGHTRIGHT":
             parent = child.get_parent()
@@ -364,9 +418,30 @@ class RedBlackTree:
 
 
         elif value == head.get_value():
+<<<<<<< HEAD
             return head
             
+=======
+            return True
+>>>>>>> 40df73bb96d72014824d3f564a1395c44095022c
 
+    def print(self):
+        self.__print_helper(self.head, "", True)
+
+    def __print_helper(self, node, indent, last):
+        # print the tree structure on the screen
+        if node != None:
+            sys.stdout.write(indent)
+            if last:
+                sys.stdout.write("R----")
+                indent += "     "
+            else:
+                sys.stdout.write("L----")
+                indent += "|    "
+
+            print(str(node.get_value()) + "(" + node.get_color() + ")")
+            self.__print_helper(node.get_left_child(), indent, False)
+            self.__print_helper(node.get_right_child(), indent, True)
 
 
 
@@ -374,7 +449,19 @@ if __name__ == "__main__":
     tree = RedBlackTree()
     tree.insert(10)
     tree.insert(7)
+<<<<<<< HEAD
     tree.insert(20)
+=======
+    
+
+    print(tree.bfs())
+    tree.insert(15)
+    print(tree.bfs())
+    tree.insert(16)
+    print(tree.bfs())
+    tree.print()
+
+>>>>>>> 40df73bb96d72014824d3f564a1395c44095022c
     tree.insert(30)
     print(tree.bfs())
     
