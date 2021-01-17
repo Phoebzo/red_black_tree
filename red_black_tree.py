@@ -152,8 +152,8 @@ class RedBlackTree:
         if self.search(value) == False:
             return None
         else:
-            return self.__pathing(value, self.head, path_list)
-
+            self.__pathing(value, self.head, path_list)
+            return path_list
 
     def min(self):
         if self.head == None:
@@ -307,22 +307,18 @@ class RedBlackTree:
     def __pathing(self, value, head, path_list):
         if value > head.get_value():
             if head.get_right_child() != None:
-                path_list.append(head)
-                self.__pathing(value, head.get_right_child(), path_list)
-            else:
                 path_list.append(head.get_value())
+                self.__pathing(value, head.get_right_child(), path_list)
 
         elif value < head.get_value(): 
             if head.get_left_child() != None:
-                path_list.append(head)
+                path_list.append(head.get_value())
                 self.__pathing(value, head.get_left_child(), path_list)
-            else:
-                path_list.append(head)
-
+                
         elif value == head.get_value():
-            path_list.append(head)  
+            path_list.append(head.get_value())  
         
-        return path_list
+        #return path_list
 
         
     def __searching(self, value, head):
