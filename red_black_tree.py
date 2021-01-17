@@ -65,7 +65,7 @@ class RedBlackTree:
                     n = n.get_left_child()
             node.set_value(n.get_value())
             self.__remove(n)
-            
+
         else:
             if node == self.head:
                 self.head = None
@@ -137,19 +137,6 @@ class RedBlackTree:
                 if sibling.get_right_child() == None or sibling.get_right_child().get_color() == "BLACK":
                     pass
             self.__double_black(node)
-
-    def __rb_transplant(self, u, v):
-        if u.get_parent() == None:
-            self.head = v
-        elif u.is_right_child() == False:
-            u.get_parent().set_left_child(v) 
-        else:
-            u.get_parent().set_right_child(v)
-        v.set_parent(u.get_parent)
-
-
-
-
 
     def search(self,value):
         if self.head == None:
